@@ -13,24 +13,24 @@ bot = telebot.TeleBot(TOKEN)
 PRICES = {
     "pack_105": {"name": "105 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 9.5},
     "pack_210": {"name": "210 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 19},
-    "pack_326": {"name": "326 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 28.5},
-    "pack_431": {"name": "431 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 38},
-    "pack_546": {"name": "546 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 47.5},
-    "pack_651": {"name": "651 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 57},
-    "pack_756": {"name": "756 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 66.5},
-    "pack_872": {"name": "872 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 76},
-    "pack_977": {"name": "977 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 85.5},
-    "pack_1113": {"name": "1113 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 95},
-    "pack_1544": {"name": "1544 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 135},
-    "pack_2398": {"name": "2398 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 190},
-    "pack_3511": {"name": "3511 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 285},
-    "pack_4796": {"name": "4796 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 380},
-    "pack_6160": {"name": "6160 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 475},
-    "pack_7273": {"name": "7273 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 570},
-    "pack_8558": {"name": "8558 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 665},
-    "pack_9671": {"name": "9671 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 760},
-    "pack_10956": {"name": "10 956 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 855},
-    "pack_12320": {"name": "12 320 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 950},
+    "pack_326": {"name": "326 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 28.5},
+    "pack_431": {"name": "431 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 38},
+    "pack_546": {"name": "546 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 47.5},
+    "pack_651": {"name": "651 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 57},
+    "pack_756": {"name": "756 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 66.5},
+    "pack_872": {"name": "872 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 76},
+    "pack_977": {"name": "977 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 85.5},
+    "pack_1113": {"name": "1113 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 95},
+    "pack_1544": {"name": "1544 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 135},
+    "pack_2398": {"name": "2398 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 190},
+    "pack_3511": {"name": "3511 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 285},
+    "pack_4796": {"name": "4796 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 380},
+    "pack_6160": {"name": "6160 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 475},
+    "pack_7273": {"name": "7273 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 570},
+    "pack_8558": {"name": "8558 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 665},
+    "pack_9671": {"name": "9671 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 760},
+    "pack_10956": {"name": "10 956 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 855},
+    "pack_12320": {"name": "12 320 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 950},
     "v_month": {"name": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒎𝒐𝒏𝒕𝒉 2600 💎", "price": 95},
     "v_nedelya": {"name": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒏𝒆𝒅𝒆𝒍𝒚𝒐𝒖 450 💎", "price": 15.5},
     "v_layt": {"name": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒍𝒂𝒚𝒕 90 💎", "price": 6},
@@ -74,9 +74,8 @@ def start(message):
     if check_sub(user_id):
         markup = types.InlineKeyboardMarkup(row_width=1)
         markup.add(
-            types.InlineKeyboardButton(text="𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝚛ее 𝙵𝚒𝒓е 💎", callback_data="buy_diamonds"),
-            types.InlineKeyboardButton(text="𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 🎫", callback_data="buy_vouchers"),
-            types.InlineKeyboardButton(text="𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒂𝒏д 𝒗𝒐𝒖𝒄𝒉𝒆𝒓 💸", callback_data="buy_gifts")
+            types.InlineKeyboardButton(text="𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 💎", callback_data="buy_diamonds"),
+            types.InlineKeyboardButton(text="𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 🎫", callback_data="buy_vouchers")
         )
         bot.send_message(user_id, """Ассалому Алейкум 🤖🤝👤
 
@@ -93,13 +92,12 @@ def start(message):
                    types.InlineKeyboardButton(text="Обуна шудам ✅", callback_data="check_sub"))
         bot.send_message(user_id, "Салом! Барои ботро истифода бурдан ба канали мо обуна шавед:", reply_markup=markup)
 
-@bot.callback_query_handler(func=lambda call: call.data in ["buy_diamonds", "buy_vouchers", "buy_gifts"])
+@bot.callback_query_handler(func=lambda call: call.data in ["buy_diamonds", "buy_vouchers"])
 def ask_id(call):
     chat_id = call.message.chat.id
     mode_text = {
         "buy_diamonds": "𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 💎",
-        "buy_vouchers": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 🎫",
-        "buy_gifts": "𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒂𝒏𝒅 𝒗𝒐𝒖𝒄𝒉𝒆𝒓 💸"
+        "buy_vouchers": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 🎫"
     }
     user_data[chat_id] = {'mode': call.data}
     markup = types.InlineKeyboardMarkup()
@@ -122,35 +120,12 @@ def process_id_step(message):
     mode = user_data[chat_id].get('mode', 'buy_diamonds')
     markup = types.InlineKeyboardMarkup(row_width=1)
     
-    if mode == "buy_gifts":
-        markup.add(
-            types.InlineKeyboardButton(text="𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 💸", callback_data="show_gift_diamonds"),
-            types.InlineKeyboardButton(text="𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒗𝒐𝒖𝒄𝒉𝒆𝒓 💸", callback_data="show_gift_vouchers"),
-            types.InlineKeyboardButton(text="𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒂𝒏𝒅 𝒗𝒐𝒖𝒄𝒉𝒆𝒓 💸", callback_data="show_gift_both")
-        )
-    else:
-        keys = [k for k in PRICES if k.startswith("pack_")] if mode == "buy_diamonds" else ["v_month", "v_nedelya", "v_layt", "v_propusk"]
-        for k in keys:
-            markup.add(types.InlineKeyboardButton(text=f"{PRICES[k]['name']} = {PRICES[k]['price']} 🇹🇯", callback_data=k))
+    keys = [k for k in PRICES if k.startswith("pack_")] if mode == "buy_diamonds" else ["v_month", "v_nedelya", "v_layt", "v_propusk"]
+    for k in keys:
+        markup.add(types.InlineKeyboardButton(text=f"{PRICES[k]['name']} = {PRICES[k]['price']} 🇹🇯", callback_data=k))
     
     markup.add(types.InlineKeyboardButton(text="БА ҚАФО 🔃", callback_data="start_over"))
     bot.send_message(chat_id, f"🆔 Қабул карда шуд ✅\n\n• 🆔 : {u_id}\n\nЛутфан маҳсулотро барои ба профилатон гузаронидан интихоб кунед :", reply_markup=markup)
-
-@bot.callback_query_handler(func=lambda call: call.data in ["show_gift_diamonds", "show_gift_vouchers", "show_gift_both"])
-def show_gift_prices(call):
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    if call.data == "show_gift_diamonds":
-        btns = ["111", "222", "333", "444", "555", "1050"]
-        for b in btns: markup.add(types.InlineKeyboardButton(text=f"𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 💸 = {b} 🇹🇯", callback_data="none"))
-    elif call.data == "show_gift_vouchers":
-        btns = ["10", "30", "70", "140", "175", "420"]
-        for b in btns: markup.add(types.InlineKeyboardButton(text=f"𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒗𝒐𝒖𝒄𝒉𝒆𝒓 💸 = {b} 🇹🇯", callback_data="none"))
-    elif call.data == "show_gift_both":
-        btns = ["50", "100", "200", "300", "500"]
-        for b in btns: markup.add(types.InlineKeyboardButton(text=f"𝒈𝒊𝒇𝒕 𝒇𝒓𝒆𝒆 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒂𝒏𝒅 𝒗𝒐𝒖𝒄𝒉𝒆𝒓 💸 = {b} 🇹🇯", callback_data="none"))
-    
-    markup.add(types.InlineKeyboardButton(text="БА ҚАФО 🔃", callback_data="buy_gifts"))
-    bot.edit_message_text("Лутфан маҳсулотро интихоб кунед :", call.message.chat.id, call.message.message_id, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data in PRICES.keys())
 def select_pack(call):
@@ -163,7 +138,7 @@ def select_pack(call):
     markup.add(types.InlineKeyboardButton(text="𝙳𝚞𝚜𝚑𝚊н𝚋𝚎 𝙲𝚒𝚝𝚢 💳", callback_data="pay_dc"),
                types.InlineKeyboardButton(text="𝙽𝚘𝚝 𝙲𝚘р𝚍 🤷🏻", callback_data="pay_not_card"),
                types.InlineKeyboardButton(text="БА ҚАФО 🔃", callback_data="start_over"))
-    game_id = user_data[chat_id].get('game_id', 'Нишон дода نشدهаст')
+    game_id = user_data[chat_id].get('game_id', 'Нишон дода нашудааст')
     bot.edit_message_text(f"Маҳсулот қабул карда шуд ✅\n\n• 🆔 : {game_id}\n• 🛍️ : {pack['name']}\n• 💸 : {pack['price']} 🇹🇯\n\nҲамаи рӯйхат пур карда шуд акнун ба супоридани маблағ мегузарем 🧾 :", chat_id, call.message.message_id, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data in ["pay_dc", "pay_not_card"])
@@ -228,4 +203,4 @@ def send_broadcast_real(message):
     bot.send_message(ADMIN_ID, "Фиристода шуд! ✅")
 
 bot.polling(none_stop=True)
-                                              
+        
