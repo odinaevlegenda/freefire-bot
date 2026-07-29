@@ -9,28 +9,28 @@ CHANNEL_ID = "@of5_bio"
 
 bot = telebot.TeleBot(TOKEN)
 
-# НАРХНОМАҲО
+# НАРХНОМАҲО (Ҳамаи номҳо якхела ва дуруст карда шуданд)
 PRICES = {
     "pack_105": {"name": "105 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 9.5},
     "pack_210": {"name": "210 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 19},
-    "pack_326": {"name": "326 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 28.5},
-    "pack_431": {"name": "431 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 38},
-    "pack_546": {"name": "546 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 47.5},
-    "pack_651": {"name": "651 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 57},
-    "pack_756": {"name": "756 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 66.5},
-    "pack_872": {"name": "872 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 76},
-    "pack_977": {"name": "977 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 85.5},
-    "pack_1113": {"name": "1113 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 95},
-    "pack_1544": {"name": "1544 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 135},
-    "pack_2398": {"name": "2398 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 190},
-    "pack_3511": {"name": "3511 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 285},
-    "pack_4796": {"name": "4796 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 380},
-    "pack_6160": {"name": "6160 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 475},
-    "pack_7273": {"name": "7273 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 570},
-    "pack_8558": {"name": "8558 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 665},
-    "pack_9671": {"name": "9671 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 760},
-    "pack_10956": {"name": "10 956 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 855},
-    "pack_12320": {"name": "12 320 𝐝𝐢𝐚𝐦𝐨н𝐝 💎", "price": 950},
+    "pack_326": {"name": "326 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 28.5},
+    "pack_431": {"name": "431 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 38},
+    "pack_546": {"name": "546 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 47.5},
+    "pack_651": {"name": "651 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 57},
+    "pack_756": {"name": "756 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 66.5},
+    "pack_872": {"name": "872 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 76},
+    "pack_977": {"name": "977 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 85.5},
+    "pack_1113": {"name": "1113 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 95},
+    "pack_1544": {"name": "1544 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 135},
+    "pack_2398": {"name": "2398 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 190},
+    "pack_3511": {"name": "3511 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 285},
+    "pack_4796": {"name": "4796 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 380},
+    "pack_6160": {"name": "6160 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 475},
+    "pack_7273": {"name": "7273 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 570},
+    "pack_8558": {"name": "8558 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 665},
+    "pack_9671": {"name": "9671 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 760},
+    "pack_10956": {"name": "10 956 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 855},
+    "pack_12320": {"name": "12 320 𝐝𝐢𝐚𝐦𝐨𝐧𝐝 💎", "price": 950},
     "v_month": {"name": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒎𝒐𝒏𝒕𝒉 2600 💎", "price": 95},
     "v_nedelya": {"name": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒏𝒆𝒅𝒆𝒍𝒚𝒐𝒖 450 💎", "price": 15.5},
     "v_layt": {"name": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒍𝒂𝒚𝒕 90 💎", "price": 6},
@@ -56,6 +56,22 @@ def check_sub(user_id):
     except Exception:
         return False
 
+def send_main_menu(chat_id):
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(
+        types.InlineKeyboardButton(text="𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝒓ее 𝙵𝚒𝒓е 💎", callback_data="buy_diamonds"),
+        types.InlineKeyboardButton(text="𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝚒𝒓е 🎫", callback_data="buy_vouchers")
+    )
+    bot.send_message(chat_id, """Ассалому Алейкум 🤖🤝👤
+
+    🤖• дар бораи бот •🤖
+
+Ин бот барои алмос ( алмаз ё ки 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 ) гузаронидан ба бозии 𝙵𝚛ее 𝙵𝚒𝒓е аст ‼️
+
+Ин бот метавонад алмосҳои шуморо дар муддати 5 дақиқа ба профили шумо бо 🆔 гузаронад ✅
+
+Барои харидани алмос лутфан тугмаҳоро интихоб кунед :""", reply_markup=markup)
+
 @bot.message_handler(commands=['admin'])
 def admin_panel(message):
     if message.from_user.id == ADMIN_ID:
@@ -72,20 +88,7 @@ def start(message):
     user_id = message.from_user.id
     save_user(user_id)
     if check_sub(user_id):
-        markup = types.InlineKeyboardMarkup(row_width=1)
-        markup.add(
-            types.InlineKeyboardButton(text="𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 💎", callback_data="buy_diamonds"),
-            types.InlineKeyboardButton(text="𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 🎫", callback_data="buy_vouchers")
-        )
-        bot.send_message(user_id, """Ассалому Алейкум 🤖🤝👤
-
-    🤖• дар бораи бот •🤖
-
-Ин бот барои алмос ( алмаз ё ки 𝒅𝒊𝒂𝒎𝒐𝒏𝒅 ) гузаронидан ба бозии 𝙵𝚛ее 𝙵𝚒𝒓е аст ‼️
-
-Ин бот метавонад алмосҳои шуморо дар муддати 5 дақиқа ба профили шумо бо 🆔 гузаронад ✅
-
-Барои харидани алмос лутфан тугмаҳоро интихоб кунед :""", reply_markup=markup)
+        send_main_menu(user_id)
     else:
         markup = types.InlineKeyboardMarkup()
         markup.add(types.InlineKeyboardButton(text=" O F 5 🔹", url="https://t.me/of5_bio"),
@@ -96,8 +99,8 @@ def start(message):
 def ask_id(call):
     chat_id = call.message.chat.id
     mode_text = {
-        "buy_diamonds": "𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 💎",
-        "buy_vouchers": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝒊𝒓е 🎫"
+        "buy_diamonds": "𝒅𝒊𝒂𝒎𝒐𝒏𝒅 𝒕𝒐 𝙵𝒓ее 𝙵𝚒𝒓е 💎",
+        "buy_vouchers": "𝒗𝒐𝒖𝒄𝒉𝒆𝒓 𝒕𝒐 𝙵𝒓ее 𝙵𝚒𝒓е 🎫"
     }
     user_data[chat_id] = {'mode': call.data}
     markup = types.InlineKeyboardMarkup()
@@ -106,11 +109,14 @@ def ask_id(call):
     bot.register_next_step_handler(call.message, process_id_step)
 
 def process_id_step(message):
-    if message.text == "/start": return
-    u_id = message.text
     chat_id = message.chat.id
+    if message.text == "/start":
+        return
+    u_id = message.text
     if not u_id or not u_id.isdigit() or not (8 <= len(u_id) <= 14):
-        msg = bot.send_message(chat_id, "Шумо иштибох кардед ‼️\nХарф бояд набошад ва ракам аз 8 то 14 то бошад ‼️\nЛутфан боз кушиш кунед :")
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton(text="БА ҚАФО 🔃", callback_data="start_over"))
+        msg = bot.send_message(chat_id, "Шумо иштибох кардед ‼️\nХарф бояд набошад ва ракам аз 8 то 14 то бошад ‼️\nЛутфан боз кушиш кунед :", reply_markup=markup)
         bot.register_next_step_handler(msg, process_id_step)
         return
     
@@ -138,7 +144,7 @@ def select_pack(call):
     markup.add(types.InlineKeyboardButton(text="𝙳𝚞𝚜𝚑𝚊н𝚋𝚎 𝙲𝚒𝚝𝚢 💳", callback_data="pay_dc"),
                types.InlineKeyboardButton(text="𝙽𝚘𝚝 𝙲𝚘р𝚍 🤷🏻", callback_data="pay_not_card"),
                types.InlineKeyboardButton(text="БА ҚАФО 🔃", callback_data="start_over"))
-    game_id = user_data[chat_id].get('game_id', 'Нишон дода нашудааст')
+    game_id = user_data[chat_id].get('game_id', 'Нишон дода نشدهаст')
     bot.edit_message_text(f"Маҳсулот қабул карда шуд ✅\n\n• 🆔 : {game_id}\n• 🛍️ : {pack['name']}\n• 💸 : {pack['price']} 🇹🇯\n\nҲамаи рӯйхат пур карда шуд акнун ба супоридани маблағ мегузарем 🧾 :", chat_id, call.message.message_id, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data in ["pay_dc", "pay_not_card"])
@@ -171,7 +177,9 @@ def send_admin_panel(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def logic_btns(call):
-    if call.data == "none": bot.answer_callback_query(call.id)
+    chat_id = call.message.chat.id
+    if call.data == "none":
+        bot.answer_callback_query(call.id)
     elif call.data == "adm_stats":
         if os.path.exists("users.txt"):
             with open("users.txt", "r") as f: count = len(f.read().splitlines())
@@ -180,19 +188,28 @@ def logic_btns(call):
     elif call.data == "adm_broadcast":
         msg = bot.send_message(ADMIN_ID, "Матни хабарномаро ворид кунед:")
         bot.register_next_step_handler(msg, send_broadcast_real)
-    elif call.data == "adm_close": bot.delete_message(call.message.chat.id, call.message.message_id)
+    elif call.data == "adm_close":
+        bot.delete_message(chat_id, call.message.message_id)
     elif call.data == "start_over":
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        start(call.message)
+        bot.clear_step_handler_by_chat_id(chat_id)
+        try:
+            bot.delete_message(chat_id, call.message.message_id)
+        except Exception:
+            pass
+        send_main_menu(chat_id)
     elif call.data == "check_sub":
         if check_sub(call.from_user.id):
-            bot.delete_message(call.message.chat.id, call.message.message_id)
-            start(call.message)
-        else: bot.answer_callback_query(call.id, "Обуна нашудаед! ❌", show_alert=True)
+            try:
+                bot.delete_message(chat_id, call.message.message_id)
+            except Exception:
+                pass
+            send_main_menu(chat_id)
+        else:
+            bot.answer_callback_query(call.id, "Обуна нашудаед! ❌", show_alert=True)
     elif "_" in call.data:
         action, target = call.data.split("_")
         bot.send_message(int(target), "Маҳсулоти шумо бо муваффақият гузаронида шуд ✅" if action == "ok" else "Рад карда шуд ❌")
-        bot.edit_message_caption("Ҷавоб дода шуд ✅", call.message.chat.id, call.message.message_id)
+        bot.edit_message_caption("Ҷавоб дода шуд ✅", chat_id, call.message.message_id)
 
 def send_broadcast_real(message):
     if not os.path.exists("users.txt"): return
@@ -203,4 +220,4 @@ def send_broadcast_real(message):
     bot.send_message(ADMIN_ID, "Фиристода шуд! ✅")
 
 bot.polling(none_stop=True)
-        
+                            
