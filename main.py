@@ -93,34 +93,43 @@ def items_callback(call):
         
     bot.register_next_step_handler(msg, process_ff_id)
 
-# Функсияи гирифтани Ник аз Donatov.net ва дигар манбаъҳо
+# Ҷустуҷӯи Никнейм
 def get_player_nickname(player_id):
-    # 1. Санҷиш тавассути Donatov.net (бо фармоиш додани Header-ҳои одамӣ)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json"
+    }
+
+    # 1. KZShopGarena
     try:
-        url = "https://donatov.net/api/shop/products/free-fire/check-player"
-        payload = {"account": str(player_id)}
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
-            "Accept": "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-            "Origin": "https://donatov.net",
-            "Referer": "https://donatov.net/free-fire-diamonds"
-        }
-        res = requests.post(url, json=payload, headers=headers, timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            nick = data.get("nickname") or data.get("name") or data.get("player_name")
-            if nick:
-                return nick
+        url_kz = f"https://kzshopgarena.com/api/check?id={player_id}"
+        res_kz = requests.get(url_kz, headers=headers, timeout=5).json()
+        if "nickname" in res_kz and res_kz["nickname"]:
+            return res_kz["nickname"]
+        if "name" in res_kz and res_kz["name"]:
+            return res_kz["name"]
     except Exception:
         pass
 
-    # 2. Агар Donatov.net ҷавоб надиҳад, тавассути API-и озоди Garena мегирад
+    # 2. Сервери эҳтиётии 1
     try:
-        url2 = f"https://api.garena.com/shop/v1/public/player/name?app_id=100067&player_id={player_id}"
-        res2 = requests.get(url2, timeout=5).json()
-        if "nickname" in res2 and res2["nickname"]:
-            return res2["nickname"]
+        url_alt1 = f"https://ff-api-roan.vercel.app/api/ff?id={player_id}"
+        res_alt1 = requests.get(url_alt1, timeout=5).json()
+        if "nickname" in res_alt1 and res_alt1["nickname"]:
+            return res_alt1["nickname"]
+        if "AccountName" in res_alt1 and res_alt1["AccountName"]:
+            return res_alt1["AccountName"]
+    except Exception:
+        pass
+
+    # 3. Сервери эҳтиётии 2
+    try:
+        url_alt2 = f"https://free-fire-api-three.vercel.app/api/ff_info?id={player_id}"
+        res_alt2 = requests.get(url_alt2, timeout=5).json()
+        if "nickname" in res_alt2 and res_alt2["nickname"]:
+            return res_alt2["nickname"]
+        if "AccountName" in res_alt2 and res_alt2["AccountName"]:
+            return res_alt2["AccountName"]
     except Exception:
         pass
 
@@ -137,7 +146,7 @@ def process_ff_id(message):
         bot.register_next_step_handler(msg, process_ff_id)
         return
 
-    wait_msg = bot.send_message(message.chat.id, "⏳ Санҷиши никнейм..." if lang == "tj" else "⏳ Проверка ника...")
+    wait_msg = bot.send_message(message.chat.id, "⏳ Санҷиши никнейм ва ID..." if lang == "tj" else "⏳ Проверка ника и ID...")
 
     # Гирифтани никнейм
     nickname = get_player_nickname(user_game_id)
@@ -147,21 +156,32 @@ def process_ff_id(message):
     except Exception:
         pass
 
+    # Агар никнейм пайдо шавад — ID ва Никро нишон медиҳад
     if nickname:
         if lang == "tj":
             success_msg = (
-                f"✅ **Аккаунт пайдо шуд!**\n\n"
-                f"🎮 **Никнейм:** `{nickname}`\n"
-                f"🆔 **ID:** `{user_game_id}`"
+                f"✅ **ID ва Никнейм тасдиқ шуд!**\n\n"
+                f"👤 **Никнейми шумо:** `{nickname}`\n"
+                f"🆔 **ID-и шумо:** `{user_game_id}`\n\n"
+                f"📌 Оё ин аккаунти шумост?"
             )
         else:
             success_msg = (
-                f"✅ **Аккаунт найден!**\n\n"
-                f"🎮 **Никнейм:** `{nickname}`\n"
-                f"🆔 **ID:** `{user_game_id}`"
-
-    bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
+                f"✅ **ID и Никнейм подтверждены!**\n\n"
+                f"👤 **Ваш Никнейм:** `{nickname}`\n"
+                f"🆔 **Ваш ID:** `{user_game_id}`\n\n"
+                f"📌 Это ваш аккаунт?"
+            )
+        bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
+    else:
+        # Агар ID нодуруст бошад ё никнейм набарояд, аз нав пурсиш мекунад
+        if lang == "tj":
+            error_msg = "❌ **Никнейм пайдо нашуд!**\n\nЛутфан ID-ро санҷида, аз нав дуруст ворид кунед:"
+        else:
+            error_msg = "❌ **Никнейм не найден!**\n\nПожалуйста, проверьте ID и введите заново:"
+            
+        msg = bot.send_message(message.chat.id, error_msg, parse_mode="Markdown")
+        bot.register_next_step_handler(msg, process_ff_id)
 
 if __name__ == "__main__":
     bot.infinity_polling(skip_pending=True, timeout=20, long_polling_timeout=10)
-        
