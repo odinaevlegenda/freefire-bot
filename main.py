@@ -1,5 +1,6 @@
 import telebot
 from telebot import types
+import requests
 
 # ==================== ТАНЗИМОТ ====================
 TOKEN = '8924908374:AAF6cctZO-gh35sBKu-uU0ntoRtjP38VLgE'
@@ -8,9 +9,8 @@ ADMIN_ID = 6895966276
 user_languages = {}
 bot = telebot.TeleBot(TOKEN)
 
-# Санҷиши обуна муваққатан хомӯш (барои санҷидани кор кардани меню)
 def check_subscriptions(user_id):
-    return []  # Ҳеҷ хатогӣ намедиҳад, гӯё ҳама обуна шудаанд
+    return []
 
 # /start
 @bot.message_handler(commands=['start'])
@@ -23,7 +23,7 @@ def start_command(message):
     else:
         show_language_menu(message.chat.id)
 
-# Менюи интихоби забон
+# Интихоби забон
 def show_language_menu(chat_id):
     markup = types.InlineKeyboardMarkup()
     btn_tj = types.InlineKeyboardButton("Тоҷики 🇹🇯", callback_data="lang_tj")
@@ -88,6 +88,7 @@ def items_callback(call):
         
     bot.register_next_step_handler(msg, process_ff_id)
 
+# Функсияи пайдо кардани НИКНЕЙМ бе API Key
 def process_ff_id(message):
     user_game_id = message.text.strip()
     user_id = message.from_user.id
@@ -99,9 +100,66 @@ def process_ff_id(message):
         bot.register_next_step_handler(msg, process_ff_id)
         return
 
-    success_msg = f"✅ **ID қабул шуд:** `{user_game_id}`" if lang == "tj" else f"✅ **ID принят:** `{user_game_id}`"
+    wait_msg = bot.send_message(message.chat.id, "⏳ Ҷустуҷӯи никнейми бозӣ..." if lang == "tj" else "⏳ Поиск ника...")
+
+    nickname = None
+    
+    # Истифодаи API-и озоди Free Fire (Region SG/IND/EU)
+    try:
+        url = f"https://region-info-ff.vercel.app/api/info?id={user_game_id}"
+        res = requests.get(url, timeout=7).json()
+        if "AccountInfo" in res and "AccountName" in res["AccountInfo"]:
+            nickname = res["AccountInfo"]["AccountName"]
+        elif "nickname" in res:
+            nickname = res["nickname"]
+    except Exception:
+        pass
+
+    # Агар аз сервери аввал нагирад, аз сервери дуюм месанҷем
+    if not nickname:
+        try:
+            url2 = f"https://free-fire-api-three.vercel.app/api/ff_info?id={user_game_id}"
+            res2 = requests.get(url2, timeout=7).json()
+            if "nickname" in res2:
+                nickname = res2["nickname"]
+            elif "AccountName" in res2:
+                nickname = res2["AccountName"]
+        except Exception:
+            pass
+
+    # Тоза кардани паёми интизорӣ
+    try:
+        bot.delete_message(message.chat.id, wait_msg.message_id)
+    except Exception:
+        pass
+
+    # Намоиши натиҷа
+    if nickname:
+        if lang == "tj":
+            success_msg = (
+                f"✅ **Аккаунт пайдо шуд!**\n\n"
+                f"🎮 **Никнейм:** `{nickname}`\n"
+                f"🆔 **ID:** `{user_game_id}`"
+            )
+        else:
+            success_msg = (
+                f"✅ **Аккаунт найден!**\n\n"
+                f"🎮 **Никнейм:** `{nickname}`\n"
+                f"🆔 **ID:** `{user_game_id}`"
+            )
+    else:
+        if lang == "tj":
+            success_msg = (
+                f"✅ **ID қабул шуд:** `{user_game_id}`\n"
+                f"⚠️ *(Никнейм ба таври автоматикӣ пайдо нашуд)*"
+            )
+        else:
+            success_msg = (
+                f"✅ **ID принят:** `{user_game_id}`\n"
+                f"⚠️ *(Никнейм не найден автоматически)*"
+            )
+
     bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
 
 if __name__ == "__main__":
     bot.infinity_polling(skip_pending=True)
-        
