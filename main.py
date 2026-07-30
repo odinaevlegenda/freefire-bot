@@ -9,6 +9,11 @@ ADMIN_ID = 6895966276
 user_languages = {}
 bot = telebot.TeleBot(TOKEN)
 
+try:
+    bot.remove_webhook()
+except Exception:
+    pass
+
 def check_subscriptions(user_id):
     return []
 
@@ -88,22 +93,39 @@ def items_callback(call):
         
     bot.register_next_step_handler(msg, process_ff_id)
 
-# Гирифтани никнейм аз Donatov.net
-def get_donatov_nickname(player_id):
+# Функсияи ҷустуҷӯи Никнейм тавассути API-ҳои озод ва зуд
+def get_freefire_nickname(player_id):
+    # Сервери 1
     try:
-        url = "https://donatov.net/api/shop/products/free-fire/check-player"
-        payload = {"account": str(player_id)}
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Content-Type": "application/json",
-            "Referer": "https://donatov.net/free-fire-diamonds"
-        }
-        res = requests.post(url, json=payload, headers=headers, timeout=5)
-        if res.status_code == 200:
-            data = res.json()
-            return data.get("name") or data.get("nickname") or data.get("player_name")
+        url = f"https://api.garena.com/shop/v1/public/player/name?app_id=100067&player_id={player_id}"
+        res = requests.get(url, timeout=5).json()
+        if "nickname" in res and res["nickname"]:
+            return res["nickname"]
     except Exception:
         pass
+
+    # Сервери 2
+    try:
+        url2 = f"https://region-info-ff.vercel.app/api/info?id={player_id}"
+        res2 = requests.get(url2, timeout=5).json()
+        if "AccountInfo" in res2 and "AccountName" in res2["AccountInfo"]:
+            return res2["AccountInfo"]["AccountName"]
+        elif "nickname" in res2:
+            return res2["nickname"]
+    except Exception:
+        pass
+
+    # Сервери 3
+    try:
+        url3 = f"https://free-fire-api-three.vercel.app/api/ff_info?id={player_id}"
+        res3 = requests.get(url3, timeout=5).json()
+        if "nickname" in res3:
+            return res3["nickname"]
+        elif "AccountName" in res3:
+            return res3["AccountName"]
+    except Exception:
+        pass
+
     return None
 
 def process_ff_id(message):
@@ -117,10 +139,10 @@ def process_ff_id(message):
         bot.register_next_step_handler(msg, process_ff_id)
         return
 
-    wait_msg = bot.send_message(message.chat.id, "⏳ Санҷиши никнейм аз Donatov.net..." if lang == "tj" else "⏳ Проверка ника через Donatov.net...")
+    wait_msg = bot.send_message(message.chat.id, "⏳ Ҷустуҷӯи никнейм..." if lang == "tj" else "⏳ Поиск ника...")
 
     # Гирифтани никнейм
-    nickname = get_donatov_nickname(user_game_id)
+    nickname = get_freefire_nickname(user_game_id)
 
     try:
         bot.delete_message(message.chat.id, wait_msg.message_id)
@@ -130,24 +152,30 @@ def process_ff_id(message):
     if nickname:
         if lang == "tj":
             success_msg = (
-                f"✅ **ID ва Никнейм пайдо шуд!**\n\n"
+                f"✅ **Аккаунт пайдо шуд!**\n\n"
                 f"🎮 **Никнейм:** `{nickname}`\n"
                 f"🆔 **ID:** `{user_game_id}`"
             )
         else:
             success_msg = (
-                f"✅ **ID и Никнейм найдены!**\n\n"
+                f"✅ **Аккаунт найден!**\n\n"
                 f"🎮 **Никнейм:** `{nickname}`\n"
                 f"🆔 **ID:** `{user_game_id}`"
             )
     else:
         if lang == "tj":
-            success_msg = f"✅ **ID қабул шуд:** `{user_game_id}`"
+            success_msg = (
+                f"✅ **ID қабул шуд:** `{user_game_id}`\n"
+                f"⚠️ *(Никнейм муайян нашуд)*"
+            )
         else:
-            success_msg = f"✅ **ID принят:** `{user_game_id}`"
+            success_msg = (
+                f"✅ **ID принят:** `{user_game_id}`\n"
+                f"⚠️ *(Никнейм не найден)*"
+            )
 
     bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
 
 if __name__ == "__main__":
-    bot.infinity_polling(skip_pending=True)
-    
+    bot.infinity_polling(skip_pending=True, timeout=20, long_polling_timeout=10)
+        
