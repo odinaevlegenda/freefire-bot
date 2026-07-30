@@ -88,7 +88,24 @@ def items_callback(call):
         
     bot.register_next_step_handler(msg, process_ff_id)
 
-# Функсияи пайдо кардани НИКНЕЙМ бе API Key
+# Гирифтани никнейм аз Donatov.net
+def get_donatov_nickname(player_id):
+    try:
+        url = "https://donatov.net/api/shop/products/free-fire/check-player"
+        payload = {"account": str(player_id)}
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Content-Type": "application/json",
+            "Referer": "https://donatov.net/free-fire-diamonds"
+        }
+        res = requests.post(url, json=payload, headers=headers, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            return data.get("name") or data.get("nickname") or data.get("player_name")
+    except Exception:
+        pass
+    return None
+
 def process_ff_id(message):
     user_game_id = message.text.strip()
     user_id = message.from_user.id
@@ -100,66 +117,37 @@ def process_ff_id(message):
         bot.register_next_step_handler(msg, process_ff_id)
         return
 
-    wait_msg = bot.send_message(message.chat.id, "⏳ Ҷустуҷӯи никнейми бозӣ..." if lang == "tj" else "⏳ Поиск ника...")
+    wait_msg = bot.send_message(message.chat.id, "⏳ Санҷиши никнейм аз Donatov.net..." if lang == "tj" else "⏳ Проверка ника через Donatov.net...")
 
-    nickname = None
-    
-    # Истифодаи API-и озоди Free Fire (Region SG/IND/EU)
-    try:
-        url = f"https://region-info-ff.vercel.app/api/info?id={user_game_id}"
-        res = requests.get(url, timeout=7).json()
-        if "AccountInfo" in res and "AccountName" in res["AccountInfo"]:
-            nickname = res["AccountInfo"]["AccountName"]
-        elif "nickname" in res:
-            nickname = res["nickname"]
-    except Exception:
-        pass
+    # Гирифтани никнейм
+    nickname = get_donatov_nickname(user_game_id)
 
-    # Агар аз сервери аввал нагирад, аз сервери дуюм месанҷем
-    if not nickname:
-        try:
-            url2 = f"https://free-fire-api-three.vercel.app/api/ff_info?id={user_game_id}"
-            res2 = requests.get(url2, timeout=7).json()
-            if "nickname" in res2:
-                nickname = res2["nickname"]
-            elif "AccountName" in res2:
-                nickname = res2["AccountName"]
-        except Exception:
-            pass
-
-    # Тоза кардани паёми интизорӣ
     try:
         bot.delete_message(message.chat.id, wait_msg.message_id)
     except Exception:
         pass
 
-    # Намоиши натиҷа
     if nickname:
         if lang == "tj":
             success_msg = (
-                f"✅ **Аккаунт пайдо шуд!**\n\n"
+                f"✅ **ID ва Никнейм пайдо шуд!**\n\n"
                 f"🎮 **Никнейм:** `{nickname}`\n"
                 f"🆔 **ID:** `{user_game_id}`"
             )
         else:
             success_msg = (
-                f"✅ **Аккаунт найден!**\n\n"
+                f"✅ **ID и Никнейм найдены!**\n\n"
                 f"🎮 **Никнейм:** `{nickname}`\n"
                 f"🆔 **ID:** `{user_game_id}`"
             )
     else:
         if lang == "tj":
-            success_msg = (
-                f"✅ **ID қабул шуд:** `{user_game_id}`\n"
-                f"⚠️ *(Никнейм ба таври автоматикӣ пайдо нашуд)*"
-            )
+            success_msg = f"✅ **ID қабул шуд:** `{user_game_id}`"
         else:
-            success_msg = (
-                f"✅ **ID принят:** `{user_game_id}`\n"
-                f"⚠️ *(Никнейм не найден автоматически)*"
-            )
+            success_msg = f"✅ **ID принят:** `{user_game_id}`"
 
     bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
 
 if __name__ == "__main__":
     bot.infinity_polling(skip_pending=True)
+    
