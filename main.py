@@ -5,74 +5,23 @@ from telebot import types
 TOKEN = '8924908374:AAF6cctZO-gh35sBKu-uU0ntoRtjP38VLgE'
 ADMIN_ID = 6895966276
 
-# Рӯйхати каналҳо
-CHANNELS = [
-    '@bio_of5',
-    '@otziv_of5'
-]
-
-# Базаи содда барои нигоҳ доштани забони корбарон
 user_languages = {}
-
 bot = telebot.TeleBot(TOKEN)
 
-# Функцияи санҷиши обуна
+# Санҷиши обуна муваққатан хомӯш (барои санҷидани кор кардани меню)
 def check_subscriptions(user_id):
-    unsubscribed = []
-    for channel in CHANNELS:
-        try:
-            member = bot.get_chat_member(channel, user_id)
-            if member.status not in ['creator', 'administrator', 'member']:
-                unsubscribed.append(channel)
-        except Exception:
-            unsubscribed.append(channel)
-    return unsubscribed
+    return []  # Ҳеҷ хатогӣ намедиҳад, гӯё ҳама обуна шудаанд
 
 # /start
 @bot.message_handler(commands=['start'])
 def start_command(message):
     user_id = message.from_user.id
-    unsubscribed = check_subscriptions(user_id)
     
-    if unsubscribed:
-        markup = types.InlineKeyboardMarkup()
-        btn1 = types.InlineKeyboardButton("Биография OF5 🔹", url="https://t.me/bio_of5")
-        btn2 = types.InlineKeyboardButton("Отзыв OF5 🔹", url="https://t.me/otziv_of5")
-        btn_check = types.InlineKeyboardButton("Тасдиқ кардан ✅", callback_data="check_subscription")
-        
-        markup.add(btn1)
-        markup.add(btn2)
-        markup.add(btn_check)
-        
-        bot.send_message(
-            message.chat.id, 
-            "• Барои истифодаи бот ба каналхои мо обуна шавед • ✅", 
-            reply_markup=markup
-        )
+    if user_id in user_languages and user_id != ADMIN_ID:
+        name = message.from_user.first_name or "Дӯст"
+        show_main_menu(message.chat.id, user_languages[user_id], name)
     else:
-        # Агар забони корбар аллакай соҳранит шуда бошад (ва админ набошад)
-        if user_id in user_languages and user_id != ADMIN_ID:
-            show_main_menu(message.chat.id, user_languages[user_id], message.from_user.first_name)
-        else:
-            # Агар забон интихоб нашуда бошад ё корбар Админ бошад
-            show_language_menu(message.chat.id)
-
-# Санҷиши кнопкаи «Тасдиқ кардан ✅»
-@bot.callback_query_handler(func=lambda call: call.data == "check_subscription")
-def check_callback(call):
-    user_id = call.from_user.id
-    unsubscribed = check_subscriptions(user_id)
-    
-    if not unsubscribed:
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        bot.answer_callback_query(call.id, "Тасдиқ қабул шуд ✅", show_alert=True)
-        
-        if user_id in user_languages and user_id != ADMIN_ID:
-            show_main_menu(call.message.chat.id, user_languages[user_id], call.from_user.first_name)
-        else:
-            show_language_menu(call.message.chat.id)
-    else:
-        bot.answer_callback_query(call.id, "Шумо то ҳол обуна нашудед ❌", show_alert=True)
+        show_language_menu(message.chat.id)
 
 # Менюи интихоби забон
 def show_language_menu(chat_id):
@@ -88,19 +37,21 @@ def show_language_menu(chat_id):
         reply_markup=markup
     )
 
-# Обработкаи кнопкаҳои забон
 @bot.callback_query_handler(func=lambda call: call.data in ["lang_tj", "lang_ru"])
 def language_callback(call):
     user_id = call.from_user.id
-    bot.delete_message(call.message.chat.id, call.message.message_id)
+    try:
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+    except Exception:
+        pass
     
-    # Соҳранит кардани забони интихобшуда
     selected_lang = "tj" if call.data == "lang_tj" else "ru"
     user_languages[user_id] = selected_lang
     
-    show_main_menu(call.message.chat.id, selected_lang, call.from_user.first_name)
+    name = call.from_user.first_name or "Дӯст"
+    show_main_menu(call.message.chat.id, selected_lang, name)
 
-# Менюи асосӣ (Алмос / Ваучер)
+# Менюи асосӣ
 def show_main_menu(chat_id, lang, first_name):
     markup = types.InlineKeyboardMarkup()
     
@@ -118,20 +69,39 @@ def show_main_menu(chat_id, lang, first_name):
     
     bot.send_message(chat_id, text, reply_markup=markup)
 
-# Обработкаи кнопкаҳои Алмос ва Ваучер
+# Пурсидани ID-и Free Fire
 @bot.callback_query_handler(func=lambda call: call.data in ["select_diamond", "select_voucher"])
 def items_callback(call):
-    # Паёми пештараро гум (нест) мекунем
-    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.answer_callback_query(call.id)
+    try:
+        bot.delete_message(call.message.chat.id, call.message.message_id)
+    except Exception:
+        pass
     
     user_id = call.from_user.id
     lang = user_languages.get(user_id, "tj")
     
-    if call.data == "select_diamond":
-        # Дар инҷо қисми ояндаи Алмосҳо меравад
-        pass
-    elif call.data == "select_voucher":
-        # Дар инҷо қисми ояндаи Ваучерҳо меравад
-        pass
+    if lang == "tj":
+        msg = bot.send_message(call.message.chat.id, "🆔 **ID-и FREE FIRE**-ро ворид кунед:", parse_mode="Markdown")
+    else:
+        msg = bot.send_message(call.message.chat.id, "🆔 Введите ваш **ID FREE FIRE**:", parse_mode="Markdown")
+        
+    bot.register_next_step_handler(msg, process_ff_id)
 
-bot.polling(none_stop=True)
+def process_ff_id(message):
+    user_game_id = message.text.strip()
+    user_id = message.from_user.id
+    lang = user_languages.get(user_id, "tj")
+    
+    if not user_game_id.isdigit():
+        err_msg = "❌ ID нодуруст аст! Лутфан танҳо рақамҳоро ворид кунед:" if lang == "tj" else "❌ Неверный ID! Пожалуйста, введите только цифры:"
+        msg = bot.send_message(message.chat.id, err_msg)
+        bot.register_next_step_handler(msg, process_ff_id)
+        return
+
+    success_msg = f"✅ **ID қабул шуд:** `{user_game_id}`" if lang == "tj" else f"✅ **ID принят:** `{user_game_id}`"
+    bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
+
+if __name__ == "__main__":
+    bot.infinity_polling(skip_pending=True)
+        
