@@ -3,7 +3,7 @@ from telebot import types
 import requests
 
 # ==================== ТАНЗИМОТ ====================
-TOKEN = '8924908374:AAF6cctZO-gh35sBKu-uU0ntoRtjP38VLgE'
+TOKEN = '8924908374:AAHPDE4yidjUpJxCdKZzPypkWsaEtD3bU5w'
 ADMIN_ID = 6895966276
 
 user_languages = {}
