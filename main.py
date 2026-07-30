@@ -159,12 +159,6 @@ def process_ff_id(message):
                 f"✅ **Аккаунт найден!**\n\n"
                 f"🎮 **Никнейм:** `{nickname}`\n"
                 f"🆔 **ID:** `{user_game_id}`"
-            )
-    else:
-        if lang == "tj":
-            success_msg = f"✅ **ID қабул шуд:** `{user_game_id}`"
-        else:
-            success_msg = f"✅ **ID принят:** `{user_game_id}`"
 
     bot.send_message(message.chat.id, success_msg, parse_mode="Markdown")
 
