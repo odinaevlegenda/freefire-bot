@@ -39,7 +39,8 @@ def check_callback(call):
     user_id = call.from_user.id
     
     if check_subscriptions(user_id):
-        bot.answer_callback_query(call.id, "Боти худкор шуморо ба бот худ роҳ дод! ✅", show_alert=True)
+        bot.answer_callback_query(call.id, "Боти худкор шуморо ба боти худ роҳ дод! ✅", show_alert=True)
+        bot.delete_message(call.message.chat.id, call.message.message_id)
     else:
         bot.answer_callback_query(call.id, "Error : 1 обуна нашудан ба каналҳо ❌", show_alert=True)
 
