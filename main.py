@@ -1,5 +1,6 @@
 import telebot
 from telebot import types
+import time
 
 TOKEN = '8701145683:AAHkSf1gMQK_j08xIvwBem40y8yF96EuixI'
 bot = telebot.TeleBot(TOKEN)
@@ -13,12 +14,16 @@ ADMIN_ID = 6895966276
 # ID-и сурати ту
 PHOTO_FILE_ID = 'QhSaZwKhMkeivwtFA' 
 
-# Базаи содда барои ҳисоби харидҳо
+# Базаи содда барои ҳисоби харидҳо ва таърих
 user_purchases = {}
-
-# Базаи содда барои сабти таърихи донатҳо
-# Мисол: user_history[user_id] = ["#78 Дар регион СНГ 546 алмос 💎 соати 18:22:43 пардохт бо муваффақият ✅"]
 user_history = {}
+
+# База барои нигоҳдории блокҳо ва кликҳои админ-панел
+# user_blocks[user_id] = timestamp_until_unblocked
+user_blocks = {}
+
+# admin_click_count[user_id] = count
+admin_clicks = {}
 
 MENU_CAPTION_TEMPLATE = (
     "Хуш омадед! {name} 🌴\n\n"
@@ -35,13 +40,30 @@ def check_subscriptions(user_id):
             return False
     return True
 
+def is_user_blocked(user_id):
+    """Тафтиш мекунад, ки корбар дар блок аст ё не"""
+    if user_id in user_blocks:
+        unblock_time = user_blocks[user_id]
+        if time.time() < unblock_time:
+            remaining_seconds = int(unblock_time - time.time())
+            hours = remaining_seconds // 3600
+            minutes = (remaining_seconds % 3600) // 60
+            return True, hours, minutes
+        else:
+            del user_blocks[user_id]
+    return False, 0, 0
+
+def block_user_hours(user_id, hours):
+    """Блок кардани корбар ба соати муайян"""
+    user_blocks[user_id] = time.time() + (hours * 3600)
+
 def get_main_menu_keyboard():
     markup = types.InlineKeyboardMarkup(row_width=2)
     
     btn1 = types.InlineKeyboardButton("FREE FIRE 🔥", callback_data="open_ff")
     btn2 = types.InlineKeyboardButton("ПРОФИЛЬ 📉", callback_data="open_profile")
     btn3 = types.InlineKeyboardButton("ТАЪРИХ 🕐", callback_data="open_history")
-    btn4 = types.InlineKeyboardButton("ҚОИДАҲО 🚧", callback_data="none")
+    btn4 = types.InlineKeyboardButton("ҚОИДАҲО 🚧", callback_data="open_rules")
     btn5 = types.InlineKeyboardButton("ПАНЕЛИ АДМИН ⚡", callback_data="admin_panel")
     
     markup.add(btn1, btn2)
@@ -65,6 +87,12 @@ def start_cmd(message):
     user_id = message.from_user.id
     user_name = message.from_user.first_name
     
+    # Тафтиши блок
+    blocked, hours, minutes = is_user_blocked(user_id)
+    if blocked:
+        bot.send_message(message.chat.id, f"⛔ Шумо ба қоидаҳо риоя накардед! Паёми шумо дар муддати {hours} соату {minutes} дақиқа қабул карда намешавад ‼️\n\nАгар иштибоҳ шуда бошад ба админ муроҷиат кунед: @odinaevff 🌴")
+        return
+
     if check_subscriptions(user_id):
         send_main_menu(message.chat.id, user_name)
     else:
@@ -86,6 +114,12 @@ def callback_listener(call):
     user_name = call.from_user.first_name
     username = call.from_user.username
     
+    # Тафтиши блок барои ҳамаи тугмаҳо
+    blocked, hours, minutes = is_user_blocked(user_id)
+    if blocked:
+        bot.answer_callback_query(call.id, f"⛔ Шумо блок ҳастед! Эътибор: {hours} соату {minutes} дақиқа", show_alert=True)
+        return
+
     # 1. Тафтиши обуна
     if call.data == "check_sub":
         if check_subscriptions(user_id):
@@ -185,7 +219,38 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, history_text, reply_markup=markup)
 
-    # 5. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
+    # 5. Тугмаи ҚОИДАҲО (Кнопка 4)
+    elif call.data == "open_rules":
+        bot.answer_callback_query(call.id)
+        
+        rules_text = (
+            "Қоидаҳо ⛔\n\n"
+            "Қоидаи 1 \n"
+            "Ҳангоми партофтани чеки тақаллубӣ дар муддати 1 соат бот паёми шуморо қабул намекунад ‼️\n\n"
+            "Қоидаи 2 \n"
+            "Аз бот ссылка, борҳояш ё паёмҳояшро дуздида (копироват) ба дигар бот фиристодан дар муддати 12 соат бот паёми шуморо қабул намекунад ‼️\n\n"
+            "Қоидаи 3\n"
+            "Ҳангоми ба паёми ПАНЕЛИ АДМИН ⚡ 3 бор зер кардан яъне ботро ба даст овардан дар муддати 24 соат бот паёми шуморо қабул намекунад ‼️\n\n"
+            "Агар ягон иштибоҳ ё нохоста пахш карди ба админ муроҷиат кунед !\n"
+            "@odinaevff 🌴"
+        )
+        
+        markup = types.InlineKeyboardMarkup()
+        btn_back = types.InlineKeyboardButton("БА ҚАФО 🔙", callback_data="back_to_menu")
+        markup.add(btn_back)
+        
+        try:
+            bot.edit_message_caption(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                caption=rules_text,
+                reply_markup=markup
+            )
+        except Exception:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            bot.send_message(call.message.chat.id, rules_text, reply_markup=markup)
+
+    # 6. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
     elif call.data == "back_to_menu":
         bot.answer_callback_query(call.id)
         caption_text = MENU_CAPTION_TEMPLATE.format(name=user_name)
@@ -202,14 +267,25 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             send_main_menu(call.message.chat.id, user_name)
 
-    # 6. Панели админ
+    # 7. Панели админ (Бо ҳисоби 3 зер кардан ва блок 24 соат)
     elif call.data == "admin_panel":
         if user_id == ADMIN_ID:
             bot.answer_callback_query(call.id, "Хуш омадед ба панели админ! ⚡", show_alert=True)
         else:
-            bot.answer_callback_query(call.id, "Error : 2 Барои админ!", show_alert=True)
+            # Ҳисоб кардани пахши тугма
+            clicks = admin_clicks.get(user_id, 0) + 1
+            admin_clicks[user_id] = clicks
+            
+            if clicks >= 3:
+                # Блок кардани корбар ба 24 соат (Қоидаи 3)
+                block_user_hours(user_id, 24)
+                admin_clicks[user_id] = 0  # Сброс
+                bot.answer_callback_query(call.id, "⛔ Шумо 3 бор кӯшиши ба даст овардани ботро кардед! Бот шуморо ба 24 соат блок кард ‼️", show_alert=True)
+            else:
+                remaining_attempts = 3 - clicks
+                bot.answer_callback_query(call.id, f"Error : 2 Барои админ! (Кӯшишҳои боқимонда: {remaining_attempts})", show_alert=True)
 
-    # 7. Тугмаҳои дигар
+    # 8. Тугмаҳои дигар
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
