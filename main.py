@@ -20,35 +20,27 @@ def check_subscriptions(user_id):
 def start_cmd(message):
     user_id = message.from_user.id
     
-    if check_subscriptions(user_id):
-        bot.send_message(message.chat.id, "Боти худкор шуморо шодбош мегуяд ! 🙂")
-    else:
-        text = (
-            "Error : 1 обуна нашудан ба канал ❌\n"
-            "Барои истифодаи Боти худкор ба каналҳои мо обуна шавед ✅"
-        )
-        
-        markup = types.InlineKeyboardMarkup()
-        btn1 = types.InlineKeyboardButton("Биография OF5 🔹", url="https://t.me/bio_of5")
-        btn2 = types.InlineKeyboardButton("Отзыв OF5 🔹", url="https://t.me/otziv_of5")
-        btn_check = types.InlineKeyboardButton("Санҷиш 🕐", callback_data="check_sub")
-        
-        markup.row(btn1, btn2)
-        markup.row(btn_check)
-        
-        bot.send_message(message.chat.id, text, reply_markup=markup)
+    text = (
+        "Барои истифодаи Боти худкор ба каналҳои мо обуна шавед ✅"
+    )
+    
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton("Биография OF5 🔹", url="https://t.me/bio_of5")
+    btn2 = types.InlineKeyboardButton("Отзыв OF5 🔹", url="https://t.me/otziv_of5")
+    btn_check = types.InlineKeyboardButton("Тафтиш кардан 🔃", callback_data="check_sub")
+    
+    markup.row(btn1, btn2)
+    markup.row(btn_check)
+    
+    bot.send_message(message.chat.id, text, reply_markup=markup)
 
 @bot.callback_query_handler(func=lambda call: call.data == "check_sub")
 def check_callback(call):
     user_id = call.from_user.id
     
     if check_subscriptions(user_id):
-        bot.answer_callback_query(call.id, "Ташаккур барои обуна шудан! ✅", show_alert=True)
-        bot.delete_message(call.message.chat.id, call.message.message_id)
-        bot.send_message(call.message.chat.id, "Боти худкор шуморо шодбош мегуяд ! 🙂")
+        bot.answer_callback_query(call.id, "Боти худкор шуморо ба бот худ роҳ дод! ✅", show_alert=True)
     else:
-        # Ин ҷо метавонӣ матни دلхоҳи худро ба ҷои "Шумо ҳанӯз фармоиш надоред!" нависед
-        bot.answer_callback_query(call.id, "❌ Шумо ҳанӯз ба ҳамаи каналҳо обуна нашудаед!", show_alert=True)
+        bot.answer_callback_query(call.id, "Error : 1 обуна нашудан ба каналҳо ❌", show_alert=True)
 
 bot.polling(none_stop=True)
-        
