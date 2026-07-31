@@ -3,7 +3,6 @@ from telebot import types
 import time
 import re
 import requests
-from bs4 import BeautifulSoup
 
 TOKEN = '8701145683:AAHkSf1gMQK_j08xIvwBem40y8yF96EuixI'
 bot = telebot.TeleBot(TOKEN)
@@ -17,15 +16,11 @@ ADMIN_ID = 6895966276
 # ID-и сурати ту
 PHOTO_FILE_ID = 'QhSaZwKhMkeivwtFA' 
 
-# Базаи содда барои ҳисоби харидҳо ва таърих
+# Базаҳои маълумот
 user_purchases = {}
 user_history = {}
-
-# База барои нигоҳдории блокҳо ва кликҳои админ-панел
 user_blocks = {}
 admin_clicks = {}
-
-# База барои сабти ҳолати пурсидани ID ва региони интихобшуда
 user_states = {}
 
 MENU_CAPTION_TEMPLATE = (
@@ -34,30 +29,48 @@ MENU_CAPTION_TEMPLATE = (
 )
 
 def get_ff_nickname(game_id):
-    """Функсия барои гирифтани никнейм аз мобилверсо"""
-    url = f"https://mobileverso.com.br/ru/freefire/%D0%B8%D0%B3%D1%80%D0%BE%D0%BA/{game_id}"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
-    }
+    """Функсия барои гирифтани аниқи никнейм аз API мустақим"""
+    # 1. Кӯшиши аввал: API-и боэътимоди Free Fire
     try:
-        response = requests.get(url, headers=headers, timeout=7)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
-            # Ҷустуҷӯи номи бозигар аз сайт
-            h1_tag = soup.find('h1')
-            if h1_tag:
-                nickname = h1_tag.text.strip()
-                return nickname
-            
-            # Ё агар дар элементи дигар бошад
-            title_tag = soup.find('title')
-            if title_tag:
-                title_text = title_tag.text.strip()
-                if "—" in title_text:
-                    return title_text.split("—")[0].strip()
-                return title_text
-    except Exception as e:
-        print(f"Хатогӣ дар парсинг: {e}")
+        url_api = f"https://freefire-virtex.vercel.app/api/checkid?id={game_id}"
+        res = requests.get(url_api, timeout=5)
+        if res.status_code == 200:
+            data = res.json()
+            if "nickname" in data and data["nickname"]:
+                return data["nickname"]
+            elif "name" in data and data["name"]:
+                return data["name"]
+    except Exception:
+        pass
+
+    # 2. Кӯшиши дуюм: API-и захиравӣ
+    try:
+        url_api2 = f"https://api.garena.com/shop/auth/check_id?id={game_id}"
+        res2 = requests.get(url_api2, timeout=5)
+        if res2.status_code == 200:
+            data2 = res2.json()
+            if "nickname" in data2:
+                return data2["nickname"]
+    except Exception:
+        pass
+
+    # 3. Кӯшиши сеюм: Дархости мустақим ба мобилверсо
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+            'Accept': 'application/json, text/plain, */*'
+        }
+        url_mv = f"https://mobileverso.com.br/api/freefire/id/{game_id}"
+        res3 = requests.get(url_mv, headers=headers, timeout=5)
+        if res3.status_code == 200:
+            data3 = res3.json()
+            if "nick" in data3:
+                return data3["nick"]
+            elif "name" in data3:
+                return data3["name"]
+    except Exception:
+        pass
+
     return None
 
 def check_subscriptions(user_id):
@@ -338,7 +351,7 @@ def callback_listener(call):
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
-# Қабули ID-и бозӣ аз корбар ва санҷиш дар сайт
+# Қабули ID-и бозӣ аз корбар ва тафтиши никнейм
 @bot.message_handler(func=lambda message: True)
 def handle_text_messages(message):
     user_id = message.from_user.id
@@ -357,7 +370,7 @@ def handle_text_messages(message):
             
             msg = bot.reply_to(message, "🔍 Лутфан сабр кунед, тафтиши ID дар сайт...")
             
-            # Тафтиш дар сайт
+            # Ҷустуҷӯи ном аз API
             player_name = get_ff_nickname(game_id_text)
             
             if player_name:
@@ -372,7 +385,7 @@ def handle_text_messages(message):
                     f"✅ 🆔-и бозии шумо қабул шуд!\n\n"
                     f"🆔: `{game_id_text}`\n"
                     f"🌍 Регион: {region}\n"
-                    f"⚠️ Номи аккаунт пайдо нашуд."
+                    f"`{player_name}`\n"
                 )
                 
             bot.edit_message_text(text, chat_id=message.chat.id, message_id=msg.message_id, parse_mode="Markdown")
@@ -380,4 +393,3 @@ def handle_text_messages(message):
             bot.reply_to(message, "🆔 - бояд рақам бошад ва аз 8-14 то бошад !")
 
 bot.polling(none_stop=True)
-        
