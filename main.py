@@ -16,6 +16,10 @@ PHOTO_FILE_ID = 'QhSaZwKhMkeivwtFA'
 # Базаи содда барои ҳисоби харидҳо
 user_purchases = {}
 
+# Базаи содда барои сабти таърихи донатҳо
+# Мисол: user_history[user_id] = ["#78 Дар регион СНГ 546 алмос 💎 соати 18:22:43 пардохт бо муваффақият ✅"]
+user_history = {}
+
 MENU_CAPTION_TEMPLATE = (
     "Хуш омадед! {name} 🌴\n\n"
     "Боти худкор аз шумо интихоби вариантҳо талаб мекунад📊 :"
@@ -36,7 +40,7 @@ def get_main_menu_keyboard():
     
     btn1 = types.InlineKeyboardButton("FREE FIRE 🔥", callback_data="open_ff")
     btn2 = types.InlineKeyboardButton("ПРОФИЛЬ 📉", callback_data="open_profile")
-    btn3 = types.InlineKeyboardButton("ТАЪРИХ 🕐", callback_data="none")
+    btn3 = types.InlineKeyboardButton("ТАЪРИХ 🕐", callback_data="open_history")
     btn4 = types.InlineKeyboardButton("ҚОИДАҲО 🚧", callback_data="none")
     btn5 = types.InlineKeyboardButton("ПАНЕЛИ АДМИН ⚡", callback_data="admin_panel")
     
@@ -146,7 +150,42 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, profile_text, reply_markup=markup)
 
-    # 4. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
+    # 4. Тугмаи ТАЪРИХ
+    elif call.data == "open_history":
+        bot.answer_callback_query(call.id)
+        
+        history_list = user_history.get(user_id, [])
+        
+        if not history_list:
+            history_text = (
+                "Таърихҳои донат дар бози ! 🛒\n\n"
+                "Шумо ҳануз ягон донат накардаед! 🚧\n\n"
+                "Инҳо буданд таърихҳои донати шумо 📊"
+            )
+        else:
+            records = "\n".join(history_list)
+            history_text = (
+                f"Таърихҳои донат дар бози ! 🛒\n\n"
+                f"{records}\n\n"
+                f"Инҳо буданд таърихҳои донати шумо 📊"
+            )
+        
+        markup = types.InlineKeyboardMarkup()
+        btn_back = types.InlineKeyboardButton("БА ҚАФО 🔙", callback_data="back_to_menu")
+        markup.add(btn_back)
+        
+        try:
+            bot.edit_message_caption(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                caption=history_text,
+                reply_markup=markup
+            )
+        except Exception:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            bot.send_message(call.message.chat.id, history_text, reply_markup=markup)
+
+    # 5. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
     elif call.data == "back_to_menu":
         bot.answer_callback_query(call.id)
         caption_text = MENU_CAPTION_TEMPLATE.format(name=user_name)
@@ -163,16 +202,16 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             send_main_menu(call.message.chat.id, user_name)
 
-    # 5. Панели админ
+    # 6. Панели админ
     elif call.data == "admin_panel":
         if user_id == ADMIN_ID:
             bot.answer_callback_query(call.id, "Хуш омадед ба панели админ! ⚡", show_alert=True)
         else:
             bot.answer_callback_query(call.id, "Error : 2 Барои админ!", show_alert=True)
 
-    # 6. Тугмаҳои дигар (ҳозир ягон амал намекунанд)
+    # 7. Тугмаҳои дигар
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
 bot.polling(none_stop=True)
-        
+    
