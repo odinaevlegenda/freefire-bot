@@ -2,6 +2,8 @@ import telebot
 from telebot import types
 import time
 import re
+import requests
+from bs4 import BeautifulSoup
 
 TOKEN = '8701145683:AAHkSf1gMQK_j08xIvwBem40y8yF96EuixI'
 bot = telebot.TeleBot(TOKEN)
@@ -31,6 +33,33 @@ MENU_CAPTION_TEMPLATE = (
     "Боти худкор аз шумо интихоби вариантҳо талаб мекунад📊 :"
 )
 
+def get_ff_nickname(game_id):
+    """Функсия барои гирифтани никнейм аз мобилверсо"""
+    url = f"https://mobileverso.com.br/ru/freefire/%D0%B8%D0%B3%D1%80%D0%BE%D0%BA/{game_id}"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'
+    }
+    try:
+        response = requests.get(url, headers=headers, timeout=7)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # Ҷустуҷӯи номи бозигар аз сайт
+            h1_tag = soup.find('h1')
+            if h1_tag:
+                nickname = h1_tag.text.strip()
+                return nickname
+            
+            # Ё агар дар элементи дигар бошад
+            title_tag = soup.find('title')
+            if title_tag:
+                title_text = title_tag.text.strip()
+                if "—" in title_text:
+                    return title_text.split("—")[0].strip()
+                return title_text
+    except Exception as e:
+        print(f"Хатогӣ дар парсинг: {e}")
+    return None
+
 def check_subscriptions(user_id):
     for channel in CHANNELS:
         try:
@@ -42,7 +71,6 @@ def check_subscriptions(user_id):
     return True
 
 def is_user_blocked(user_id):
-    """Тафтиш мекунад, ки корбар дар блок аст ё не"""
     if user_id in user_blocks:
         unblock_time = user_blocks[user_id]
         if time.time() < unblock_time:
@@ -55,7 +83,6 @@ def is_user_blocked(user_id):
     return False, 0, 0
 
 def block_user_hours(user_id, hours):
-    """Блок кардани корбар ба соати муайян"""
     user_blocks[user_id] = time.time() + (hours * 3600)
 
 def get_main_menu_keyboard():
@@ -88,11 +115,9 @@ def start_cmd(message):
     user_id = message.from_user.id
     user_name = message.from_user.first_name
     
-    # Тоза кардани ҳолати пурсиш ҳангоми /start
     if user_id in user_states:
         del user_states[user_id]
 
-    # Тафтиши блок
     blocked, hours, minutes = is_user_blocked(user_id)
     if blocked:
         bot.send_message(message.chat.id, f"⛔ Шумо ба қоидаҳо риоя накардед! Паёми шумо дар муддати {hours} соату {minutes} дақиқа қабул карда намешавад ‼️\n\nАгар иштибоҳ шуда бошад ба админ муроҷиат кунед: @odinaevff 🌴")
@@ -119,13 +144,11 @@ def callback_listener(call):
     user_name = call.from_user.first_name
     username = call.from_user.username
     
-    # Тафтиши блок барои ҳамаи тугмаҳо
     blocked, hours, minutes = is_user_blocked(user_id)
     if blocked:
         bot.answer_callback_query(call.id, f"⛔ Шумо блок ҳастед! Эътибор: {hours} соату {minutes} дақиқа", show_alert=True)
         return
 
-    # 1. Тафтиши обуна
     if call.data == "check_sub":
         if check_subscriptions(user_id):
             bot.answer_callback_query(call.id, "Боти худкор шуморо ба боти худ роҳ дод! ✅", show_alert=True)
@@ -134,7 +157,6 @@ def callback_listener(call):
         else:
             bot.answer_callback_query(call.id, "Error : 1 обуна нашудан ба каналҳо ❌", show_alert=True)
 
-    # 2. Тугмаи FREE FIRE
     elif call.data == "open_ff":
         bot.answer_callback_query(call.id)
         
@@ -159,7 +181,6 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, ff_text, reply_markup=markup)
 
-    # Интихоби региони SG ё INDONESIA
     elif call.data in ["select_region_sg", "select_region_id"]:
         bot.answer_callback_query(call.id)
         
@@ -187,7 +208,6 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, ask_id_text, reply_markup=markup)
 
-    # 3. Тугмаи ПРОФИЛЬ
     elif call.data == "open_profile":
         bot.answer_callback_query(call.id)
         
@@ -217,7 +237,6 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, profile_text, reply_markup=markup)
 
-    # 4. Тугмаи ТАЪРИХ
     elif call.data == "open_history":
         bot.answer_callback_query(call.id)
         
@@ -252,7 +271,6 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, history_text, reply_markup=markup)
 
-    # 5. Тугмаи ҚОИДАҲО (Кнопка 4)
     elif call.data == "open_rules":
         bot.answer_callback_query(call.id)
         
@@ -283,7 +301,6 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, rules_text, reply_markup=markup)
 
-    # 6. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
     elif call.data == "back_to_menu":
         bot.answer_callback_query(call.id)
         if user_id in user_states:
@@ -303,7 +320,6 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             send_main_menu(call.message.chat.id, user_name)
 
-    # 7. Панели админ (Бо ҳисоби 3 зер кардан ва блок 24 соат)
     elif call.data == "admin_panel":
         if user_id == ADMIN_ID:
             bot.answer_callback_query(call.id, "Хуш омадед ба панели админ! ⚡", show_alert=True)
@@ -319,32 +335,49 @@ def callback_listener(call):
                 remaining_attempts = 3 - clicks
                 bot.answer_callback_query(call.id, f"Error : 2 Барои админ! (Кӯшишҳои боқимонда: {remaining_attempts})", show_alert=True)
 
-    # 8. Тугмаҳои дигар
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
-# Қабули ID-и бозӣ аз корбар
+# Қабули ID-и бозӣ аз корбар ва санҷиш дар сайт
 @bot.message_handler(func=lambda message: True)
 def handle_text_messages(message):
     user_id = message.from_user.id
     
-    # Тафтиши блок
     blocked, hours, minutes = is_user_blocked(user_id)
     if blocked:
         bot.send_message(message.chat.id, f"⛔ Шумо ба қоидаҳо риоя накардед! Паёми шумо дар муддати {hours} соату {minutes} дақиқа қабул карда намешавад ‼️\n\nАгар иштибоҳ шуда бошад ба админ муроҷиат кунед: @odinaevff 🌴")
         return
 
-    # Тафтиш агар бот дар интизории ID бошад
     if user_id in user_states and user_states[user_id].get('state') == 'waiting_for_game_id':
         game_id_text = message.text.strip()
         
-        # Санҷиши ID: танҳо рақамҳо ва дарозӣ аз 8 то 14
         if re.fullmatch(r'^\d{8,14}$', game_id_text):
             region = user_states[user_id].get('region', '')
-            del user_states[user_id]  # Ҳолатро тоза мекунем
+            del user_states[user_id]
             
-            bot.reply_to(message, f"✅ 🆔-и бозии шумо қабул шуд!\n\n🆔: `{game_id_text}`\nРегион: {region}", parse_mode="Markdown")
+            msg = bot.reply_to(message, "🔍 Лутфан сабр кунед, тафтиши ID дар сайт...")
+            
+            # Тафтиш дар сайт
+            player_name = get_ff_nickname(game_id_text)
+            
+            if player_name:
+                text = (
+                    f"✅ 🆔-и бозии шумо қабул шуд!\n\n"
+                    f"👤 Ники аккаунт: `{player_name}`\n"
+                    f"🆔: `{game_id_text}`\n"
+                    f"🌍 Регион: {region}"
+                )
+            else:
+                text = (
+                    f"✅ 🆔-и бозии шумо қабул шуд!\n\n"
+                    f"🆔: `{game_id_text}`\n"
+                    f"🌍 Регион: {region}\n"
+                    f"⚠️ Номи аккаунт пайдо нашуд."
+                )
+                
+            bot.edit_message_text(text, chat_id=message.chat.id, message_id=msg.message_id, parse_mode="Markdown")
         else:
             bot.reply_to(message, "🆔 - бояд рақам бошад ва аз 8-14 то бошад !")
 
 bot.polling(none_stop=True)
+        
