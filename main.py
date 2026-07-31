@@ -13,6 +13,9 @@ ADMIN_ID = 6895966276
 # ID-и сурати ту
 PHOTO_FILE_ID = 'QhSaZwKhMkeivwtFA' 
 
+# Базаи содда барои ҳисоби харидҳо (дар ҳолати аввала 0)
+user_purchases = {}
+
 MENU_CAPTION_TEMPLATE = (
     "Хуш омадед! {name} 🌴\n\n"
     "Боти худкор аз шумо интихоби вариантҳо талаб мекунад📊 :"
@@ -32,7 +35,7 @@ def get_main_menu_keyboard():
     markup = types.InlineKeyboardMarkup(row_width=2)
     
     btn1 = types.InlineKeyboardButton("FREE FIRE 🔥", callback_data="none")
-    btn2 = types.InlineKeyboardButton("ПРОФИЛЬ 📉", callback_data="none")
+    btn2 = types.InlineKeyboardButton("ПРОФИЛЬ 📉", callback_data="open_profile")
     btn3 = types.InlineKeyboardButton("ТАЪРИХ 🕐", callback_data="none")
     btn4 = types.InlineKeyboardButton("ҚОИДАҲО 🚧", callback_data="none")
     btn5 = types.InlineKeyboardButton("ПАНЕЛИ АДМИН ⚡", callback_data="admin_panel")
@@ -48,10 +51,8 @@ def send_main_menu(chat_id, user_name):
     keyboard = get_main_menu_keyboard()
     
     try:
-        # Фиристодани сурат тавассути File ID
         bot.send_photo(chat_id, PHOTO_FILE_ID, caption=caption_text, reply_markup=keyboard)
     except Exception as e:
-        # Агар ID хато бошад ё сурат наравад, танҳо матнро мефиристад
         print(f"Хатогӣ дар фиристодани сурат: {e}")
         bot.send_message(chat_id, caption_text, reply_markup=keyboard)
 
@@ -79,7 +80,9 @@ def start_cmd(message):
 def callback_listener(call):
     user_id = call.from_user.id
     user_name = call.from_user.first_name
+    username = call.from_user.username
     
+    # 1. Тафтиши обуна
     if call.data == "check_sub":
         if check_subscriptions(user_id):
             bot.answer_callback_query(call.id, "Боти худкор шуморо ба боти худ роҳ дод! ✅", show_alert=True)
@@ -88,13 +91,64 @@ def callback_listener(call):
         else:
             bot.answer_callback_query(call.id, "Error : 1 обуна нашудан ба каналҳо ❌", show_alert=True)
 
+    # 2. Тугмаи ПРОФИЛЬ
+    elif call.data == "open_profile":
+        bot.answer_callback_query(call.id)
+        
+        # Омода кардани никнейм ва харидҳо
+        user_nick = f"@{username}" if username else "Мавҷуд нест"
+        purchases = user_purchases.get(user_id, 0)
+        
+        profile_text = (
+            f"Салом! {user_name} 🌴\n\n"
+            f"🔠 : {user_nick}\n"
+            f"🆔 : {user_id}\n"
+            f"🛒 : #{purchases}\n\n"
+            f"Ин профили шумо аст! 😋"
+        )
+        
+        markup = types.InlineKeyboardMarkup()
+        btn_back = types.InlineKeyboardButton("БА ҚАФО 🔙", callback_data="back_to_menu")
+        markup.add(btn_back)
+        
+        try:
+            bot.edit_message_caption(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                caption=profile_text,
+                reply_markup=markup
+            )
+        except Exception:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            bot.send_message(call.message.chat.id, profile_text, reply_markup=markup)
+
+    # 3. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
+    elif call.data == "back_to_menu":
+        bot.answer_callback_query(call.id)
+        caption_text = MENU_CAPTION_TEMPLATE.format(name=user_name)
+        keyboard = get_main_menu_keyboard()
+        
+        try:
+            bot.edit_message_caption(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                caption=caption_text,
+                reply_markup=keyboard
+            )
+        except Exception:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            send_main_menu(call.message.chat.id, user_name)
+
+    # 4. Панели админ
     elif call.data == "admin_panel":
         if user_id == ADMIN_ID:
             bot.answer_callback_query(call.id, "Хуш омадед ба панели админ! ⚡", show_alert=True)
         else:
             bot.answer_callback_query(call.id, "Error : 2 Барои админ!", show_alert=True)
 
+    # 5. Тугмаҳои дигар
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
 bot.polling(none_stop=True)
+                                      
