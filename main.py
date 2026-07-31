@@ -13,7 +13,7 @@ ADMIN_ID = 6895966276
 # ID-и сурати ту
 PHOTO_FILE_ID = 'QhSaZwKhMkeivwtFA' 
 
-# Базаи содда барои ҳисоби харидҳо (дар ҳолати аввала 0)
+# Базаи содда барои ҳисоби харидҳо
 user_purchases = {}
 
 MENU_CAPTION_TEMPLATE = (
@@ -34,7 +34,7 @@ def check_subscriptions(user_id):
 def get_main_menu_keyboard():
     markup = types.InlineKeyboardMarkup(row_width=2)
     
-    btn1 = types.InlineKeyboardButton("FREE FIRE 🔥", callback_data="none")
+    btn1 = types.InlineKeyboardButton("FREE FIRE 🔥", callback_data="open_ff")
     btn2 = types.InlineKeyboardButton("ПРОФИЛЬ 📉", callback_data="open_profile")
     btn3 = types.InlineKeyboardButton("ТАЪРИХ 🕐", callback_data="none")
     btn4 = types.InlineKeyboardButton("ҚОИДАҲО 🚧", callback_data="none")
@@ -91,11 +91,35 @@ def callback_listener(call):
         else:
             bot.answer_callback_query(call.id, "Error : 1 обуна нашудан ба каналҳо ❌", show_alert=True)
 
-    # 2. Тугмаи ПРОФИЛЬ
+    # 2. Тугмаи FREE FIRE
+    elif call.data == "open_ff":
+        bot.answer_callback_query(call.id)
+        
+        ff_text = "Шумо дар кадом Регион мехоҳед донат кунед ? 🤔"
+        
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        btn_sg = types.InlineKeyboardButton("FREE FIRE SG 🇹🇯", callback_data="none")
+        btn_id = types.InlineKeyboardButton("FREE FIRE INDONESIA 🇮🇩", callback_data="none")
+        btn_back = types.InlineKeyboardButton("БА ҚАФО 🔙", callback_data="back_to_menu")
+        
+        markup.add(btn_sg, btn_id)
+        markup.add(btn_back)
+        
+        try:
+            bot.edit_message_caption(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                caption=ff_text,
+                reply_markup=markup
+            )
+        except Exception:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            bot.send_message(call.message.chat.id, ff_text, reply_markup=markup)
+
+    # 3. Тугмаи ПРОФИЛЬ
     elif call.data == "open_profile":
         bot.answer_callback_query(call.id)
         
-        # Омода кардани никнейм ва харидҳо
         user_nick = f"@{username}" if username else "Мавҷуд нест"
         purchases = user_purchases.get(user_id, 0)
         
@@ -122,7 +146,7 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, profile_text, reply_markup=markup)
 
-    # 3. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
+    # 4. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
     elif call.data == "back_to_menu":
         bot.answer_callback_query(call.id)
         caption_text = MENU_CAPTION_TEMPLATE.format(name=user_name)
@@ -139,16 +163,16 @@ def callback_listener(call):
             bot.delete_message(call.message.chat.id, call.message.message_id)
             send_main_menu(call.message.chat.id, user_name)
 
-    # 4. Панели админ
+    # 5. Панели админ
     elif call.data == "admin_panel":
         if user_id == ADMIN_ID:
             bot.answer_callback_query(call.id, "Хуш омадед ба панели админ! ⚡", show_alert=True)
         else:
             bot.answer_callback_query(call.id, "Error : 2 Барои админ!", show_alert=True)
 
-    # 5. Тугмаҳои дигар
+    # 6. Тугмаҳои дигар (ҳозир ягон амал намекунанд)
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
 bot.polling(none_stop=True)
-                                      
+        
