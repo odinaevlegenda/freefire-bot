@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 import time
+import re
 
 TOKEN = '8701145683:AAHkSf1gMQK_j08xIvwBem40y8yF96EuixI'
 bot = telebot.TeleBot(TOKEN)
@@ -19,11 +20,11 @@ user_purchases = {}
 user_history = {}
 
 # База барои нигоҳдории блокҳо ва кликҳои админ-панел
-# user_blocks[user_id] = timestamp_until_unblocked
 user_blocks = {}
-
-# admin_click_count[user_id] = count
 admin_clicks = {}
+
+# База барои сабти ҳолати пурсидани ID ва региони интихобшуда
+user_states = {}
 
 MENU_CAPTION_TEMPLATE = (
     "Хуш омадед! {name} 🌴\n\n"
@@ -87,6 +88,10 @@ def start_cmd(message):
     user_id = message.from_user.id
     user_name = message.from_user.first_name
     
+    # Тоза кардани ҳолати пурсиш ҳангоми /start
+    if user_id in user_states:
+        del user_states[user_id]
+
     # Тафтиши блок
     blocked, hours, minutes = is_user_blocked(user_id)
     if blocked:
@@ -136,8 +141,8 @@ def callback_listener(call):
         ff_text = "Шумо дар кадом Регион мехоҳед донат кунед ? 🤔"
         
         markup = types.InlineKeyboardMarkup(row_width=2)
-        btn_sg = types.InlineKeyboardButton("FREE FIRE SG 🇹🇯", callback_data="none")
-        btn_id = types.InlineKeyboardButton("FREE FIRE INDONESIA 🇮🇩", callback_data="none")
+        btn_sg = types.InlineKeyboardButton("FREE FIRE SG 🇹🇯", callback_data="select_region_sg")
+        btn_id = types.InlineKeyboardButton("FREE FIRE INDONESIA 🇮🇩", callback_data="select_region_id")
         btn_back = types.InlineKeyboardButton("БА ҚАФО 🔙", callback_data="back_to_menu")
         
         markup.add(btn_sg, btn_id)
@@ -153,6 +158,34 @@ def callback_listener(call):
         except Exception:
             bot.delete_message(call.message.chat.id, call.message.message_id)
             bot.send_message(call.message.chat.id, ff_text, reply_markup=markup)
+
+    # Интихоби региони SG ё INDONESIA
+    elif call.data in ["select_region_sg", "select_region_id"]:
+        bot.answer_callback_query(call.id)
+        
+        region_name = "FREE FIRE SG 🇹🇯" if call.data == "select_region_sg" else "FREE FIRE INDONESIA 🇮🇩"
+        user_states[user_id] = {'state': 'waiting_for_game_id', 'region': region_name}
+        
+        ask_id_text = (
+            f"Регион: {region_name}\n\n"
+            "Лутфан 🆔 - бозиро фиристед ба бот!\n"
+            "Мисол : 112345678910"
+        )
+        
+        markup = types.InlineKeyboardMarkup()
+        btn_back = types.InlineKeyboardButton("БА ҚАФО 🔙", callback_data="open_ff")
+        markup.add(btn_back)
+        
+        try:
+            bot.edit_message_caption(
+                chat_id=call.message.chat.id,
+                message_id=call.message.message_id,
+                caption=ask_id_text,
+                reply_markup=markup
+            )
+        except Exception:
+            bot.delete_message(call.message.chat.id, call.message.message_id)
+            bot.send_message(call.message.chat.id, ask_id_text, reply_markup=markup)
 
     # 3. Тугмаи ПРОФИЛЬ
     elif call.data == "open_profile":
@@ -253,6 +286,9 @@ def callback_listener(call):
     # 6. Тугмаи БА ҚАФО (Баргаштан ба менюи асосӣ)
     elif call.data == "back_to_menu":
         bot.answer_callback_query(call.id)
+        if user_id in user_states:
+            del user_states[user_id]
+            
         caption_text = MENU_CAPTION_TEMPLATE.format(name=user_name)
         keyboard = get_main_menu_keyboard()
         
@@ -272,14 +308,12 @@ def callback_listener(call):
         if user_id == ADMIN_ID:
             bot.answer_callback_query(call.id, "Хуш омадед ба панели админ! ⚡", show_alert=True)
         else:
-            # Ҳисоб кардани пахши тугма
             clicks = admin_clicks.get(user_id, 0) + 1
             admin_clicks[user_id] = clicks
             
             if clicks >= 3:
-                # Блок кардани корбар ба 24 соат (Қоидаи 3)
                 block_user_hours(user_id, 24)
-                admin_clicks[user_id] = 0  # Сброс
+                admin_clicks[user_id] = 0
                 bot.answer_callback_query(call.id, "⛔ Шумо 3 бор кӯшиши ба даст овардани ботро кардед! Бот шуморо ба 24 соат блок кард ‼️", show_alert=True)
             else:
                 remaining_attempts = 3 - clicks
@@ -289,5 +323,28 @@ def callback_listener(call):
     elif call.data == "none":
         bot.answer_callback_query(call.id)
 
-bot.polling(none_stop=True)
+# Қабули ID-и бозӣ аз корбар
+@bot.message_handler(func=lambda message: True)
+def handle_text_messages(message):
+    user_id = message.from_user.id
     
+    # Тафтиши блок
+    blocked, hours, minutes = is_user_blocked(user_id)
+    if blocked:
+        bot.send_message(message.chat.id, f"⛔ Шумо ба қоидаҳо риоя накардед! Паёми шумо дар муддати {hours} соату {minutes} дақиқа қабул карда намешавад ‼️\n\nАгар иштибоҳ шуда бошад ба админ муроҷиат кунед: @odinaevff 🌴")
+        return
+
+    # Тафтиш агар бот дар интизории ID бошад
+    if user_id in user_states and user_states[user_id].get('state') == 'waiting_for_game_id':
+        game_id_text = message.text.strip()
+        
+        # Санҷиши ID: танҳо рақамҳо ва дарозӣ аз 8 то 14
+        if re.fullmatch(r'^\d{8,14}$', game_id_text):
+            region = user_states[user_id].get('region', '')
+            del user_states[user_id]  # Ҳолатро тоза мекунем
+            
+            bot.reply_to(message, f"✅ 🆔-и бозии шумо қабул шуд!\n\n🆔: `{game_id_text}`\nРегион: {region}", parse_mode="Markdown")
+        else:
+            bot.reply_to(message, "🆔 - бояд рақам бошад ва аз 8-14 то бошад !")
+
+bot.polling(none_stop=True)
